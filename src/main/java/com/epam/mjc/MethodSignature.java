@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MethodSignature {
-    private String accessModifier;
+    private String accessModifier = null;
     private String returnType;
     private String methodName;
     private final List<Argument> arguments;
