@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MethodSignature {
-    private String accessModifier = null;
+    private String accessModifier;
     private String returnType;
     private String methodName;
     private final List<Argument> arguments;
@@ -16,6 +16,12 @@ public class MethodSignature {
 
     public MethodSignature(String methodName) {
         this(methodName, new ArrayList<>());
+
+    }
+
+    public MethodSignature() {
+
+        arguments = new ArrayList<>();
     }
 
     public String getMethodName() {
@@ -46,6 +52,9 @@ public class MethodSignature {
         return arguments;
     }
 
+    public void setArguments(List<Argument> arguments) {
+    }
+
     public static class Argument {
         private String type;
         private String name;
@@ -53,6 +62,9 @@ public class MethodSignature {
         public Argument(String type, String name) {
             this.type = type;
             this.name = name;
+        }
+
+        public Argument() {
         }
 
         public String getType() {

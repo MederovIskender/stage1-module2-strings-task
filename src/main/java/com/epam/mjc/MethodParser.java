@@ -1,5 +1,8 @@
 package com.epam.mjc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MethodParser {
 
     /**
@@ -20,39 +23,50 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        if (signatureString == null || signatureString.isEmpty()) {
-            throw new IllegalArgumentException("Signature string must not be null or empty.");
+        MethodSignature methodSignature = new MethodSignature();
+
+        // Split the signatureString into parts
+        String[] parts = signatureString.split("\\s|\\(|\\)|,");
+
+        // Set access modifier if present
+        if (isAccessModifier(parts[0])) {
+            methodSignature.setAccessModifier(parts[0]);
+            parts = shiftArray(parts, 1);
         }
 
-        String[] parts = signatureString.split("\\(");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid method signature format: " + signatureString);
-        }
+        // Set return type
+        methodSignature.setReturnType(parts[0]);
+        parts = shiftArray(parts, 1);
 
-        String methodInfo = parts[0].trim();
-        String argumentsPart = parts[1].trim().replace(")", ""); // Remove the closing parenthesis
+        // Set method name
+        methodSignature.setMethodName(parts[0]);
+        parts = shiftArray(parts, 1);
 
-        String[] methodParts = methodInfo.split("\\s+", 2); // Split into at most 2 parts
-        MethodSignature methodSignature = new MethodSignature(methodParts[methodParts.length - 1]); // Last part is always the method name
-
-        if (methodParts.length >= 2) {
-            methodSignature.setReturnType(methodParts[0]); // Swap the order of assignment
-            methodSignature.setAccessModifier(methodParts[1]); // Swap the order of assignment
-        } else {
-            methodSignature.setReturnType(methodParts[0]);
-        }
-
-        String[] argumentStrings = argumentsPart.split(",");
-        for (String argumentString : argumentStrings) {
-            argumentString = argumentString.trim();
-            String[] argumentParts = argumentString.split("\\s+");
-            if (argumentParts.length == 2) {
-                methodSignature.getArguments().add(new MethodSignature.Argument(argumentParts[0], argumentParts[1]));
-            } else {
-                throw new IllegalArgumentException("Invalid argument format: " + argumentString);
-            }
-        }
+        // Parse arguments
+        List<MethodSignature.Argument> arguments = parseArguments(parts);
+        methodSignature.setArguments(arguments);
 
         return methodSignature;
     }
+
+    private boolean isAccessModifier(String s) {
+        return s.equals("public") || s.equals("protected") || s.equals("private");
+    }
+
+    private String[] shiftArray(String[] arr, int count) {
+        String[] result = new String[arr.length - count];
+        System.arraycopy(arr, count, result, 0, result.length);
+        return result;
+    }
+
+    private List<MethodSignature.Argument> parseArguments(String[] parts) {
+        List<MethodSignature.Argument> arguments = new ArrayList<>();
+        for (int i = 0; i < parts.length-1; i += 2) {
+            String argType = parts[i];
+            String argName = parts[i + 1];
+            arguments.add(new MethodSignature.Argument(argType, argName));
+        }
+        return arguments;
+    }
+
 }
